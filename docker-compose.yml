@@ -1,5 +1,5 @@
 nginx:
-  build: nginx-image
+  build: nginx
   links:
     - letsencrypt
     - app
@@ -26,6 +26,6 @@ letsencrypt:
   environment:
     - TERM=xterm
 app:
-  build: app-image
+  build: app
   ports:
     - "80"
