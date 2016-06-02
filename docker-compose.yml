@@ -2,9 +2,14 @@ nginx:
   build: nginx
   links:
     - letsencrypt
-    - app
+    - rocketchat:app_to_proxy
   environment:
-    - MY_DOMAIN_NAME=wat010.opsrobot.co.uk
+    - MY_DOMAIN_NAME=my.example.com
+    - LETSENCRYPT_IP=letsencrypt
+    - LETSENCRYPT_PORT_80=80
+    - LETSENCRYPT_PORT_443=443
+    - APPLICATION_IP=app_to_proxy
+    - APPLICATION_PORT=3000
   mem_limit: 2g
   cpu_shares: 256
   # restart: always
@@ -15,7 +20,7 @@ nginx:
     - letsencrypt
 letsencrypt:
   image: quay.io/letsencrypt/letsencrypt:latest
-  command:  bash -c "sleep 6 && certbot certonly --standalone -d wat010.opsrobot.co.uk --text --agree-tos --email george@opsrobot.co.uk --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --renew-by-default --standalone-supported-challenges http-01"
+  command:  bash -c "sleep 6 && certbot certonly --standalone -d my.example.com --text --agree-tos --email user@my.example.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --renew-by-default --standalone-supported-challenges http-01"
   entrypoint: ""
   volumes:
     - /etc/letsencrypt
@@ -25,7 +30,7 @@ letsencrypt:
     - "443"
   environment:
     - TERM=xterm
-db:
+mongo:
   image: mongo
   volumes:
     - ./data/runtime/db:/data/db
@@ -36,9 +41,9 @@ rocketchat:
   image: rocketchat/rocket.chat:latest
   environment:
     - MONGO_URL=mongodb://db:27017/rocketchat
-    - ROOT_URL=https://chat.inumio.com
+    - ROOT_URL=https://chat.example.com
   links:
-    - db:db
+    - mongo:db
   ports:
     - 3000:3000
 
