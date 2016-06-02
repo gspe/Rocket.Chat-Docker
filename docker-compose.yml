@@ -1,3 +1,20 @@
+mongo:
+  image: mongo
+  volumes:
+    - ./data/runtime/db:/data/db
+    - ./data/dump:/dump
+  command: mongod --smallfiles
+
+rocketchat:
+  image: rocketchat/rocket.chat:latest
+  environment:
+    - MONGO_URL=mongodb://db:27017/rocketchat
+    - ROOT_URL=https://chat.example.com
+  links:
+    - mongo:db
+  ports:
+    - "3000"
+
 nginx:
   build: nginx
   links:
@@ -18,6 +35,7 @@ nginx:
     - "443:443"
   volumes_from:
     - letsencrypt
+
 letsencrypt:
   image: quay.io/letsencrypt/letsencrypt:latest
   command:  bash -c "sleep 6 && certbot certonly --standalone -d my.example.com --text --agree-tos --email user@my.example.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --renew-by-default --standalone-supported-challenges http-01"
@@ -30,34 +48,18 @@ letsencrypt:
     - "443"
   environment:
     - TERM=xterm
-mongo:
-  image: mongo
-  volumes:
-    - ./data/runtime/db:/data/db
-    - ./data/dump:/dump
-  command: mongod --smallfiles
 
-rocketchat:
-  image: rocketchat/rocket.chat:latest
-  environment:
-    - MONGO_URL=mongodb://db:27017/rocketchat
-    - ROOT_URL=https://chat.example.com
-  links:
-    - mongo:db
-  ports:
-    - 3000:3000
-
-hubot:
-  image: rocketchat/hubot-rocketchat
-  environment:
-    - ROCKETCHAT_URL=165.114.165.21:3000
-    - ROCKETCHAT_ROOM=GENERAL
-    - ROCKETCHAT_USER=Botname
-    - ROCKETCHAT_PASSWORD=BotPassw0rd
-    - BOT_NAME=Botname
-    - EXTERNAL_SCRIPTS=hubot-help,hubot-seen,hubot-links,hubot-greetings
-  links:
-    - rocketchat:rocketchat
-# this is used to expose the hubot port for notifications on the host on port 3001, e.g. for hubot-jenkins-notifier
-  ports:
-    - 3001:8080
+# hubot:
+#   image: rocketchat/hubot-rocketchat
+#   environment:
+#     - ROCKETCHAT_URL=165.114.165.21:3000
+#     - ROCKETCHAT_ROOM=GENERAL
+#     - ROCKETCHAT_USER=Botname
+#     - ROCKETCHAT_PASSWORD=BotPassw0rd
+#     - BOT_NAME=Botname
+#     - EXTERNAL_SCRIPTS=hubot-help,hubot-seen,hubot-links,hubot-greetings
+#   links:
+#     - rocketchat:rocketchat
+# # this is used to expose the hubot port for notifications on the host on port 3001, e.g. for hubot-jenkins-notifier
+#   ports:
+#     - "3001:8080"
