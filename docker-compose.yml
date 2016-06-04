@@ -7,9 +7,12 @@ mongo:
 
 rocketchat:
   image: rocketchat/rocket.chat:latest
+#  volumes:
+#     - ./uploads:/app/uploads
   environment:
-    - MONGO_URL=mongodb://db:27017/rocketchat
+    - PORT=3000
     - ROOT_URL=https://chat.example.com
+    - MONGO_URL=mongodb://db:27017/rocketchat
   links:
     - mongo:db
   ports:
@@ -52,12 +55,12 @@ letsencrypt:
 # hubot:
 #   image: rocketchat/hubot-rocketchat
 #   environment:
-#     - ROCKETCHAT_URL=165.114.165.21:3000
+#     - ROCKETCHAT_URL=rocketchat:3000
 #     - ROCKETCHAT_ROOM=GENERAL
 #     - ROCKETCHAT_USER=Botname
 #     - ROCKETCHAT_PASSWORD=BotPassw0rd
 #     - BOT_NAME=Botname
-#     - EXTERNAL_SCRIPTS=hubot-help,hubot-seen,hubot-links,hubot-greetings
+#     - EXTERNAL_SCRIPTS=hubot-help,hubot-seen,hubot-links,hubot-greetings,hubot-diagnostics
 #   links:
 #     - rocketchat:rocketchat
 # # this is used to expose the hubot port for notifications on the host on port 3001, e.g. for hubot-jenkins-notifier
